@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "math.h": "c",
+        "aio.h": "c",
+        "body.h": "c",
+        "ncurses.h": "c",
+        "__node_handle": "c"
     }
 }
