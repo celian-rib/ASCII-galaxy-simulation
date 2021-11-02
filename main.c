@@ -46,11 +46,20 @@ int main() {
         endwin();
 
     // init_grid_bodys(&grid);
-    Vector2 center = {
-        .x = grid.cols / (2 * CHAR_WIDTH),
+    Vector2 pos1 = {
+        .x = (grid.cols / (2 * CHAR_WIDTH)) / 2,
         .y = grid.rows / 2,
     };
-    summon_galaxy(&grid, &center);
+    // Vector2 vel1 = {0, 0};
+    Vector2 vel1 = {40, 0};
+    Vector2 pos2 = {
+        .x = ((grid.cols / (2 * CHAR_WIDTH)) / 2) * 3,
+        .y = grid.rows / 2,
+    };
+    Vector2 vel2 = {-40, 0};
+
+    summon_galaxy(&grid, &pos1, &vel1);
+    summon_galaxy(&grid, &pos2, &vel2);
 
     if (!DISABLE_CURSES) {
         draw_grid(&grid);

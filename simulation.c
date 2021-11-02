@@ -7,8 +7,9 @@
 
 const float CHAR_WIDTH = 3.0f;
 // const float STEP = 0.005f;
-const float STEP = 0.005f;
-const int GALAXY_RADIUS = 21;
+const float STEP = 0.004f;
+// const int GALAXY_RADIUS = 21;
+const int GALAXY_RADIUS = 15;
 const chtype SYMBOLS[3] = {'X', '@', 'O'};
 
 void simulate(const Grid *grid) {
@@ -66,13 +67,16 @@ void print_vector(const Vector2 *v, char *name) {
     printf("%s (%f, %f)\n", name, v->x, v->y);
 }
 
-void summon_galaxy(Grid *grid, const Vector2 *position) {
+void summon_galaxy(Grid *grid, const Vector2 *position, const Vector2 *initial_velocity) {
     for (int x = position->x - GALAXY_RADIUS; x < position->x + GALAXY_RADIUS; x++) {
         for (int y = position->y - GALAXY_RADIUS; y < position->y + GALAXY_RADIUS; y++) {
             float d = distance(y, x, position->y, position->x);
 
             if (d > GALAXY_RADIUS)
                 continue;
+
+            // TO DO DENSITY EN FCT DE LA DISTANCE
+            // TO DO SPEED EN FCT DE LA DISTANCE
 
             Body new_body = {
                 .position = {x, y},
@@ -88,13 +92,15 @@ void summon_galaxy(Grid *grid, const Vector2 *position) {
                 .y = dir_to_center.x,
             };
 
-            print_vector(position, "center position");
-            print_vector(&new_body.position, "b position");
-            print_vector(&dir_to_center, "b -> center dir");
-            print_vector(&start_direction, "start direction");
+            // print_vector(position, "center position");
+            // print_vector(&new_body.position, "b position");
+            // print_vector(&dir_to_center, "b -> center dir");
+            // print_vector(&start_direction, "start direction");
 
-            new_body.speed.x = start_direction.x / (GALAXY_RADIUS - d) * 600;
-            new_body.speed.y = start_direction.y / (GALAXY_RADIUS - d) * 600;
+            new_body.speed.x = start_direction.x / ((GALAXY_RADIUS - d) + 1) * 400;
+            new_body.speed.y = start_direction.y / ((GALAXY_RADIUS - d) + 1) * 400;
+            new_body.speed.x += initial_velocity->x;
+            new_body.speed.y += initial_velocity->y;
 
             grid->bodys = realloc(grid->bodys, (grid->count + 1) * sizeof(Body));
             grid->bodys[grid->count++] = new_body;
