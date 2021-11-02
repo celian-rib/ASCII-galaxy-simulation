@@ -10,6 +10,8 @@ int simulated_steps = 1;
 double last_draw_time = 0;
 double simulation_time = 0;
 
+const int DISABLE_CURSES = 0;
+
 void draw_header(const Grid *grid) {
     char str[grid->cols];
     sprintf(str, "Simulated steps: %d", simulated_steps);
@@ -24,7 +26,8 @@ void draw_header(const Grid *grid) {
 
 void draw_grid(const Grid *grid) {
     for (int i = 0; i < grid->count; i++)
-        mvaddch(grid->bodys[i].position.y, grid->bodys[i].position.x * CHAR_WIDTH, grid->bodys[i].symbol);
+        mvaddch(grid->bodys[i].position.y, grid->bodys[i].position.x * CHAR_WIDTH,
+                grid->bodys[i].symbol);
 }
 
 int main() {
@@ -39,12 +42,23 @@ int main() {
     };
     getmaxyx(stdscr, grid.rows, grid.cols);
 
-    init_grid_bodys(&grid);
+    if (DISABLE_CURSES)
+        endwin();
 
-    draw_grid(&grid);
-    refresh();
+    // init_grid_bodys(&grid);
+    Vector2 center = {
+        .x = grid.cols / (2 * CHAR_WIDTH),
+        .y = grid.rows / 2,
+    };
+    summon_galaxy(&grid, &center);
+
+    if (!DISABLE_CURSES) {
+        draw_grid(&grid);
+        refresh();
+    }
     while (1) {
-        clear();
+        if (!DISABLE_CURSES)
+            clear();
         clock_t begin = clock();
         simulate(&grid);
         simulated_steps++;
@@ -52,12 +66,13 @@ int main() {
         simulation_time = (double)(end - begin) / CLOCKS_PER_SEC;
 
         begin = clock();
-        draw_grid(&grid);
+        if (!DISABLE_CURSES) {
+            draw_grid(&grid);
+            draw_header(&grid);
+            refresh();
+        }
         end = clock();
         last_draw_time = (double)(end - begin) / CLOCKS_PER_SEC;
-
-        draw_header(&grid);
-        refresh();
     }
 
     endwin();
