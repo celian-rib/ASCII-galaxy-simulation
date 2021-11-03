@@ -48,15 +48,16 @@ int main() {
     // init_grid_bodys(&grid);
     Vector2 pos1 = {
         .x = (grid.cols / (2 * CHAR_WIDTH)) / 2,
+        // .x = (grid.cols / (2 * CHAR_WIDTH)),
         .y = grid.rows / 2,
     };
     // Vector2 vel1 = {0, 0};
-    Vector2 vel1 = {40, 0};
+    Vector2 vel1 = {-5, 3};
     Vector2 pos2 = {
         .x = ((grid.cols / (2 * CHAR_WIDTH)) / 2) * 3,
         .y = grid.rows / 2,
     };
-    Vector2 vel2 = {-40, 0};
+    Vector2 vel2 = {5, -3};
 
     summon_galaxy(&grid, &pos1, &vel1);
     summon_galaxy(&grid, &pos2, &vel2);

@@ -8,6 +8,7 @@ typedef struct {
     chtype symbol;
     Vector2 position;
     Vector2 speed;
+    Vector2 acceleration;
     struct Body *closests;
 } Body;
 

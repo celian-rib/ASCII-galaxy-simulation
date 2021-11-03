@@ -1,16 +1,19 @@
 #include "simulation.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 #include "body.h"
 #include "vector2.h"
 
+const chtype SYMBOLS[3] = {'X', '#', 'O'};
 const float CHAR_WIDTH = 3.0f;
-// const float STEP = 0.005f;
-const float STEP = 0.004f;
-// const int GALAXY_RADIUS = 21;
-const int GALAXY_RADIUS = 15;
-const chtype SYMBOLS[3] = {'X', '@', 'O'};
+
+const float STEP = 0.05f;
+
+const int RING_COUNT = 5;
+const int RING_SPACING = 2;
+const int RING_BODY_MULTIPLIER = 40;
 
 void simulate(const Grid *grid) {
     for (int i = 0; i < grid->count; i++) {
@@ -21,11 +24,15 @@ void simulate(const Grid *grid) {
                 continue;
             Body *other = &(grid->bodys[j]);
             float d = bodys_distance(body, other);
-            if (d > 50)
-                continue;
+            
+            // Vector2 dir = *direction(&(body->position), &(other->position));
+            // normalize(&dir);
+            // body->acceleration.x += 1 / ((d * d) + 1) * (dir.x / d);
+            // body->acceleration.y += 1 / ((d * d) + 1) * (dir.y / d);
+
             Vector2 normalized_dir = normalize_direction(body, other);
-            acceleration.x += (normalized_dir.x / (d + 10)) * 100;
-            acceleration.y += (normalized_dir.y / (d + 10)) * 100;
+            acceleration.x += (normalized_dir.x / (d + 0.1f));
+            acceleration.y += (normalized_dir.y / (d + 0.1f));
         }
         body->speed.x += acceleration.x * STEP;
         body->speed.y += acceleration.y * STEP;
@@ -34,76 +41,66 @@ void simulate(const Grid *grid) {
     }
 }
 
-void init_grid_bodys(Grid *grid) {
-    Body center = {
-        .position = {
-            .x = grid->cols / (2 * CHAR_WIDTH),
-            .y = grid->rows / 2,
-        },
-    };
-
-    for (int i = 0; i < grid->rows; i++) {
-        for (int j = 0; j < grid->cols; j++) {
-            float d = distance(i, j, grid->rows / 2, grid->cols / (2 * CHAR_WIDTH));
-            if (d > GALAXY_RADIUS)
-                continue;
-            // if (rand() % 2)
-            //     continue;
-            grid->bodys = realloc(grid->bodys, (grid->count + 1) * sizeof(Body));
-
-            Body b = {.position = {.x = j, .y = i}, .symbol = SYMBOLS[rand() % 3]};
-            Vector2 normalized_dir = normalize_direction(&b, &center);
-            float distance = bodys_distance(&b, &center);
-            b.speed.x = (-normalized_dir.y / ((GALAXY_RADIUS - distance) + 5)) * 800;
-            b.speed.y = (normalized_dir.x / ((GALAXY_RADIUS - distance) + 5)) * 800;
-            // b.speed.x = 0;
-            b.speed.y -= 3;
-            grid->bodys[grid->count++] = b;
-        }
-    }
-}
-
 void print_vector(const Vector2 *v, char *name) {
     printf("%s (%f, %f)\n", name, v->x, v->y);
 }
 
 void summon_galaxy(Grid *grid, const Vector2 *position, const Vector2 *initial_velocity) {
-    for (int x = position->x - GALAXY_RADIUS; x < position->x + GALAXY_RADIUS; x++) {
-        for (int y = position->y - GALAXY_RADIUS; y < position->y + GALAXY_RADIUS; y++) {
-            float d = distance(y, x, position->y, position->x);
+    for (int r = 1; r < RING_COUNT + 1; r++) {
 
-            if (d > GALAXY_RADIUS)
-                continue;
+        float distance_to_center = r * RING_SPACING;
+        int body_count_on_ring = r * RING_BODY_MULTIPLIER;
 
-            // TO DO DENSITY EN FCT DE LA DISTANCE
-            // TO DO SPEED EN FCT DE LA DISTANCE
+        float angle_between_bodies = 2 * M_PI / body_count_on_ring;
+        float body_speed = sqrt(1 / distance_to_center);
 
+        chtype symbol = SYMBOLS[(rand() % 4) - 1];
+
+        for (int i = 0; i < body_count_on_ring; i++) {
+            float angle = i * angle_between_bodies;
             Body new_body = {
-                .position = {x, y},
-                .symbol = SYMBOLS[rand() % 3],
+                // Set position around the current ring
+                .position = {
+                    .x = position->x + (distance_to_center * cos(angle)), 
+                    .y = position->y + (distance_to_center * sin(angle)),
+                },
+                // Set position perpendicular to the ring normal
+                .speed = {
+                    .x = initial_velocity->x + body_speed * -sin(angle) * 40,
+                    .y = initial_velocity->y + body_speed * cos(angle) * 40,
+                },
+                .symbol = symbol,
             };
-
-            Vector2 dir_to_center = *direction(&new_body.position, position);
-            normalize(&dir_to_center);
-
-            //Rotate 90 degree dir_to_center to get perpendicular direction
-            Vector2 start_direction = {
-                .x = -dir_to_center.y,
-                .y = dir_to_center.x,
-            };
-
-            // print_vector(position, "center position");
-            // print_vector(&new_body.position, "b position");
-            // print_vector(&dir_to_center, "b -> center dir");
-            // print_vector(&start_direction, "start direction");
-
-            new_body.speed.x = start_direction.x / ((GALAXY_RADIUS - d) + 1) * 400;
-            new_body.speed.y = start_direction.y / ((GALAXY_RADIUS - d) + 1) * 400;
-            new_body.speed.x += initial_velocity->x;
-            new_body.speed.y += initial_velocity->y;
 
             grid->bodys = realloc(grid->bodys, (grid->count + 1) * sizeof(Body));
             grid->bodys[grid->count++] = new_body;
         }
     }
+
+    //         // TO DO DENSITY EN FCT DE LA DISTANCE
+    //         // TO DO SPEED EN FCT DE LA DISTANCE
+
+    // Body new_body = {
+    //     .position = {x, y},
+    //     .symbol = SYMBOLS[rand() % 3],
+    // };
+
+    // Vector2 dir_to_center = *direction(&new_body.position, position);
+    // normalize(&dir_to_center);
+
+    // // Rotate 90 degree dir_to_center to get perpendicular direction
+    // Vector2 start_direction = {
+    //     .x = -dir_to_center.y,
+    //     .y = dir_to_center.x,
+    // };
+
+    // print_vector(position, "center position");
+    // print_vector(&new_body.position, "b position");
+    // print_vector(&dir_to_center, "b -> center dir");
+    // print_vector(&start_direction, "start direction");
+
+    // new_body.speed.x = start_direction.x / ((GALAXY_RADIUS - d) + 1) * 400;
+    // new_body.speed.y = start_direction.y / ((GALAXY_RADIUS - d) + 1) * 400;
+    // new_body.speed.x += initial_velocity->x;
+    // new_body.speed.y += initial_velocity->y;
 }

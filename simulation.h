@@ -11,8 +11,6 @@ extern const chtype SYMBOLS[3];
 
 void simulate(const Grid *grid);
 
-void init_grid_bodys(Grid *grid);
-
 void summon_galaxy(Grid *grid, const Vector2 *position, const Vector2 *initial_velocity);
 
 #endif
