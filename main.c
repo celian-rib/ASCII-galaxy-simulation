@@ -86,5 +86,7 @@ int main() {
     }
 
     endwin();
+
+    free(grid.bodys);
     return 0;
 }
