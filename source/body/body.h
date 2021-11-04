@@ -1,7 +1,7 @@
 #ifndef BODY
 #define BODY
 
-#include "vector2.h"
+#include "../utils/vector2.h"
 #include <ncurses.h>
 
 typedef struct {
