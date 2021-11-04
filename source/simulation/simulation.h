@@ -1,8 +1,8 @@
 #ifndef SIMULATION
 #define SIMULATION
 
-#include "../body/body.h"
-#include "../utils/vector2.h"
+#include "body.h"
+#include "vector2.h"
 
 extern const float CHAR_WIDTH;
 extern const float STEP;

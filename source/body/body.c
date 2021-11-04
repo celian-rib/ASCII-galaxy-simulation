@@ -1,5 +1,5 @@
-#include "../body/body.h"
-#include "../utils/vector2.h"
+#include "body.h"
+#include "vector2.h"
 #include <math.h>
 
 Vector2 normalize_direction(const Body *b, const Body *a) {

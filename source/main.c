@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "./simulation/simulation.h"
+#include "simulation.h"
 
 int simulated_steps = 1;
 double last_draw_time = 0;

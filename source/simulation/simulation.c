@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "../body/body.h"
-#include "../utils/vector2.h"
+#include "body.h"
+#include "vector2.h"
 
 const chtype SYMBOLS[3] = {'X', '#', 'O'};
 const float CHAR_WIDTH = 3.0f;
