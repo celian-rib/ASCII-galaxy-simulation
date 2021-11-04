@@ -8,3 +8,9 @@
 ### Goal :
 - Galaxy with black hole (Should make the galaxies more stable)
 - Optimized interactions between bodies
+
+### Run the project :
+
+```make```
+
+```./galaxy```
