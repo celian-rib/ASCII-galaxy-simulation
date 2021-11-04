@@ -1,67 +1,60 @@
+# Name of the main target (= executable name)
+TARGET = galaxy
+
+# Compiler command to user
 CC = gcc
+# Flags to add to the compiler command
 CFLAGS = --std=c11 -g -Wall -Wextra -Wunused -Wunused -pedantic -D_XOPEN_SOURCE=700
+# Ncurse specific flag
 LDFLAGS=-lncurses
 
-SRC := ./source
-# OBJ := ./obj
+# Path to the project source
+SOURCEDIR = ./source
+# Subdirectories in the project source /!\ NOT WORKING RECURSIVELY
+SUBDIR = $(shell find $(SOURCEDIR) -maxdepth 1 -type d)
+# Directorie that will contains all objects (.o) files
+DIR_OBJ = ./obj
 
-# SOURCES = $(shell find $(SRCDIR) -type f -name "*.c*")
-# HEADERS = $(shell find $(SRCDIR) -type f -name "*.h*")
+# Find all .h files in the projects
+HEADERS = $(wildcard *.h $(foreach fd, $(SUBDIR), $(fd)/*.h))
+# Find all .c files in the projects
+SOURCES = $(wildcard *.c $(foreach fd, $(SUBDIR), $(fd)/*.c))
 
-SOURCES := $(wildcard $(SRC)/*.c)
-OBJECTS := ./source/body/body.o ./source/simulation/simulation.o ./source/main.o
+# Create all objects path relative to the makefile
+OBJECTS = $(addprefix $(DIR_OBJ)/, $(SOURCES:c=o))
+# Add -I in front of all project subdirectories (-I = include in the compilation)
+INC_DIRS = -I./ $(addprefix -I, $(SUBDIR))
 
-main: ./source/body/body.o ./source/simulation/simulation.o ./source/main.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OBJECTS)
+PHONY := $(TARGET)
 
-source/body.o: ./source/body/body.c ./source/body/body.h
-	$(CC) $(CFLAGS) $(LDFLAGS) -I./source/utils -c ./source/body/body.c
+# Main target for all objects
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECTS)
 
-source/simulation.o: ./source/simulation/simulation.c ./source/simulation/simulation.h
-	$(CC) $(CFLAGS) $(LDFLAGS) -I./source/utils -I./source/body -c ./source/simulation/simulation.c
+# Generic target for all .o files
+$(DIR_OBJ)/%.o: %.c $(HEADERS)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $< $(INC_DIRS)
 
-
-
-
-
-
-# all: $(OBJECTS)
-# 	$(CC) $^ -o $@
-
-# $(OBJ)/%.o: $(SRC)/%.c
-# 	$(CC) -I$(SRC) -c $< -o $@
-
-# OBJECTS := $(patsubst $(SRCDIR)/%.c, %.o, $(SOURCES))
-
-# all: $(OBJECTS)
-# 	$(CC) $^ -o $@
-
-# %.o: $(SRCDIR)/%.c
-# 	$(CC) -I$(SRCDIR) -c $< -o $@
-
-# debug:
-# 	$(call echo, "SOURCES : $(SOURCES)")
-# 	$(call echo, "HEADERS : $(HEADERS)")
-# 	$(CC) -c $(SOURCES)
-
+PHONY += clean
+# Clean target to remove all generated files
 clean:
-	rm -rf *.o main
+	rm -rf $(TARGET) $(DIR_OBJ)/*
 
-# $(TARGET): $(BINDIR) $(BUILDDIR) $(OBJECTS)
-# 	@$(CC) $(OBJECTS) -o $(TARGET) $(LIB)
-# 	$(call print_green,"$(TARGET) has been created!")
+# Debug target to check this makefile variables
+PHONY += debug
+debug:
+	@echo "HEADERS: $(HEADERS)"
+	@echo "SOURCES: $(SOURCES)"
+	@echo "OBJECTS: $(OBJECTS)"
+	@echo "INC_DIRS: $(INC_DIRS)"
+	@echo "SOURCEDDIR: $(SOURCEDIR)"
+	@echo "SUBDIR: $(SUBDIR)"
 
-# $(BUILDDIR) :
-# 	mkdir $(BUILDDIR)
+.PHONY = $(PHONY)
 
-# $(BINDIR):
-# 	mkdir $(BINDIR)
-	
-# $(BUILDDIR)/%.o: $(SRCDIR)/%.c*
-# 	@mkdir -p $(dir $@)
-# 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
-# 	@$(CC) $(CFLAGS) $(INC) -M $< -MT $@ > $(@:.o=.td)
-# 	@cp $(@:.o=.td) $(@:.o=.d); 
-# 	@sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-# 	-e '/^$$/ d' -e 's/$$/ :/' < $(@:.o=.td) >> $(@:.o=.d); 
-# 	@rm -f $(@:.o=.td)
+
+#############################################################################
+# Mostly made thanks to:
+# https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
+#############################################################################
