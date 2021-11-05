@@ -1,4 +1,4 @@
-# Galaxy simulation running in your terminal
+# Galaxy simulation running into your terminal.
 > Small project that is not an accurate simulation at all. The goal was to have fun and to learn something along the way.
 > 
 > No optimisation has been done and all the simulation is based on basic vectorial Euler integration.
@@ -33,6 +33,6 @@ make
 ./galaxy collision
 ```
 
-> It is strongly recommended to zoom out a little (ctrl -)
+> It is strongly recommended to go fullscreen and to zoom out a little (ctrl -)
 ***
 
