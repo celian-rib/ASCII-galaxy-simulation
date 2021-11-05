@@ -41,8 +41,38 @@ void draw_help() {
 
 void draw_grid(const Grid *grid) {
     for (int i = 0; i < grid->count; i++)
-        mvaddch(grid->bodys[i].position.y, grid->bodys[i].position.x * CHAR_WIDTH,
-                grid->bodys[i].symbol);
+        mvaddch(grid->bodys[i].position.y, grid->bodys[i].position.x * CHAR_WIDTH, 'X');
+}
+
+void main_loop(const Simulation *sim) {
+    if (!DISABLE_CURSES) {
+        draw_grid(sim->grid);
+        refresh();
+    } else {
+        endwin();
+    }
+    while (1) {
+        clock_t begin = clock();
+
+        if (!DISABLE_CURSES)
+            clear();
+
+        simulate(sim);
+        simulated_steps++;
+
+        clock_t end = clock();
+        simulation_time = (double)(end - begin) / CLOCKS_PER_SEC;
+        begin = clock();
+
+        if (!DISABLE_CURSES) {
+            draw_grid(sim->grid);
+            draw_header(sim->grid);
+            refresh();
+        }
+
+        end = clock();
+        last_draw_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -55,35 +85,38 @@ int main(int argc, char *argv[]) {
     Grid grid = {
         .bodys = NULL,
         .count = 0,
-        .rows = 20,
-        .cols = 20,
+        .rows = 60,
+        .cols = 60,
     };
+
     getmaxyx(stdscr, grid.rows, grid.cols);
 
-    float step = 0.05f;
+    if(DISABLE_CURSES)
+        endwin();
 
     if (argc <= 1) {
         Simulation sim ={
+            .grid = &grid,
             .STEP = 0.05f,
             .RING_COUNT = 5,
             .RING_SPACING = 2,
             .RING_BODY_MULTIPLIER = 40
         };
-        step = sim.STEP;
         Vector2 pos = {
             .x = grid.cols / (2 * CHAR_WIDTH),
             .y = grid.rows / 2,
         };
-        Vector2 vel = {0, 0};
-        summon_galaxy(&sim, &grid, &pos, &vel);
+        Vector2 vel = {10, 0};
+        summon_galaxy(&sim, &pos, &vel);
+        main_loop(&sim);
     } else if (!strcmp(argv[1], "collision")) {
         Simulation sim ={
+            .grid = &grid,
             .STEP = 0.05f,
             .RING_COUNT = 5,
             .RING_SPACING = 2,
             .RING_BODY_MULTIPLIER = 40
         };
-        step = sim.STEP;
         Vector2 pos1 = {
             .x = (grid.cols / (2 * CHAR_WIDTH)) / 2,
             .y = grid.rows / 2,
@@ -94,8 +127,9 @@ int main(int argc, char *argv[]) {
             .y = grid.rows / 2,
         };
         Vector2 vel2 = {5, -3};
-        summon_galaxy(&sim, &grid, &pos1, &vel1);
-        summon_galaxy(&sim, &grid, &pos2, &vel2);
+        summon_galaxy(&sim, &pos1, &vel1);
+        summon_galaxy(&sim, &pos2, &vel2);
+        main_loop(&sim);
     } else if (!strcmp(argv[1], "blackhole")) {
         endwin();
         printf("Not implemented\n");
@@ -104,39 +138,6 @@ int main(int argc, char *argv[]) {
         endwin();
         draw_help();
         return 127;
-    }
-
-    if (DISABLE_CURSES) {
-    }
-    if (!DISABLE_CURSES) {
-        draw_grid(&grid);
-        refresh();
-    } else {
-        endwin();
-    }
-
-    // Main loop
-    while (1) {
-        clock_t begin = clock();
-
-        if (!DISABLE_CURSES)
-            clear();
-
-        simulate(step, &grid);
-        simulated_steps++;
-
-        clock_t end = clock();
-        simulation_time = (double)(end - begin) / CLOCKS_PER_SEC;
-        begin = clock();
-
-        if (!DISABLE_CURSES) {
-            draw_grid(&grid);
-            draw_header(&grid);
-            refresh();
-        }
-
-        end = clock();
-        last_draw_time = (double)(end - begin) / CLOCKS_PER_SEC;
     }
 
     // Disable ncurse

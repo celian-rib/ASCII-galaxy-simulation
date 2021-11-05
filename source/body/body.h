@@ -5,21 +5,13 @@
 #include <ncurses.h>
 
 typedef struct {
-    chtype symbol;
     Vector2 position;
     Vector2 speed;
     Vector2 acceleration;
     struct Body *closests;
 } Body;
 
-typedef struct {
-    int rows;
-    int cols;
-    int count;
-    Body *bodys;
-} Grid;
-
-Vector2 normalize_direction();
+Vector2 normalize_direction(const Vector2 *b, const Vector2 *a);
 
 void normalize(Vector2 *v);
 Vector2 *direction(const Vector2 *a, const Vector2 *b);

@@ -2,15 +2,20 @@
 #include "vector2.h"
 #include <math.h>
 
-Vector2 normalize_direction(const Body *b, const Body *a) {
-    Vector2 dir = {a->position.x - b->position.x, a->position.y - b->position.y};
+Vector2 normalize_direction(const Vector2 *b, const Vector2 *a) {
+    Vector2 dir = {a->x - b->x, a->y - b->y};
     float magnitude = sqrt(dir.x * dir.x + dir.y * dir.y);
-    Vector2 n = {.x = dir.x / magnitude, .y = dir.y / magnitude};
-    return n;
+    if (magnitude == 0)
+        return (Vector2){0, 0};
+    return (Vector2){.x = dir.x / magnitude, .y = dir.y / magnitude};
 }
 
 void normalize(Vector2 *v) {
     float magnitude = sqrt((v->x * v->x) + (v->y * v->y));
+    if (magnitude == 0) {
+        *v = (Vector2) {0, 0};
+        return;
+    }
     v->x /= magnitude;
     v->y /= magnitude;
 }
