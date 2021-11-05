@@ -1,7 +1,7 @@
 # Name of the main target (= executable name)
 TARGET = galaxy
 
-# Compiler command to user
+# Compiler command to use
 CC = gcc
 # Flags to add to the compiler command
 CFLAGS = --std=c11 -g -Wall -Wextra -Wunused -Wunused -pedantic -D_XOPEN_SOURCE=700

@@ -60,7 +60,30 @@ int main(int argc, char *argv[]) {
     };
     getmaxyx(stdscr, grid.rows, grid.cols);
 
+    float step = 0.05f;
+
     if (argc <= 1) {
+        Simulation sim ={
+            .STEP = 0.05f,
+            .RING_COUNT = 5,
+            .RING_SPACING = 2,
+            .RING_BODY_MULTIPLIER = 40
+        };
+        step = sim.STEP;
+        Vector2 pos = {
+            .x = grid.cols / (2 * CHAR_WIDTH),
+            .y = grid.rows / 2,
+        };
+        Vector2 vel = {0, 0};
+        summon_galaxy(&sim, &grid, &pos, &vel);
+    } else if (!strcmp(argv[1], "collision")) {
+        Simulation sim ={
+            .STEP = 0.05f,
+            .RING_COUNT = 5,
+            .RING_SPACING = 2,
+            .RING_BODY_MULTIPLIER = 40
+        };
+        step = sim.STEP;
         Vector2 pos1 = {
             .x = (grid.cols / (2 * CHAR_WIDTH)) / 2,
             .y = grid.rows / 2,
@@ -71,8 +94,8 @@ int main(int argc, char *argv[]) {
             .y = grid.rows / 2,
         };
         Vector2 vel2 = {5, -3};
-        summon_galaxy(&grid, &pos1, &vel1);
-        summon_galaxy(&grid, &pos2, &vel2);
+        summon_galaxy(&sim, &grid, &pos1, &vel1);
+        summon_galaxy(&sim, &grid, &pos2, &vel2);
     } else if (!strcmp(argv[1], "blackhole")) {
         endwin();
         printf("Not implemented\n");
@@ -99,7 +122,7 @@ int main(int argc, char *argv[]) {
         if (!DISABLE_CURSES)
             clear();
 
-        simulate(&grid);
+        simulate(step, &grid);
         simulated_steps++;
 
         clock_t end = clock();

@@ -14,3 +14,7 @@
 ```make```
 
 ```./galaxy```
+
+- collision
+
+- blackhole
