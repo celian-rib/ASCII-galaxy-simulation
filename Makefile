@@ -4,7 +4,7 @@ TARGET = galaxy
 # Compiler command to use
 CC = gcc
 # Flags to add to the compiler command
-CFLAGS = --std=c11 -g -Wall -Wextra -Wunused -Wunused -pedantic -D_XOPEN_SOURCE=700
+CFLAGS = --std=c11 -g -Wall -Wextra -Wunused -pedantic -D_XOPEN_SOURCE=700
 # Ncurse specific flag
 LDFLAGS=-lncurses
 
@@ -34,7 +34,7 @@ $(TARGET): $(OBJECTS)
 # Generic target for all .o files
 $(DIR_OBJ)/%.o: %.c $(HEADERS)
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $< $(INC_DIRS)
+	$(CC) $(CFLAGS) -o $@ -c $< $(INC_DIRS)
 
 PHONY += clean
 # Clean target to remove all generated files

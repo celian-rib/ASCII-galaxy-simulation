@@ -1,20 +1,23 @@
-# ASCII-galaxy-simulation (Work in progress)
-
-### Current result :
-- Two galaxies colliding
+# Galaxy simulation in the terminal
 
 <img src="http://github.com/celian-rib/ASCII-galaxy-simulation/blob/main/img/collision.gif?raw=true" />
 
-### Goal :
-- Galaxy with black hole (Should make the galaxies more stable)
-- Optimized interactions between bodies
+<img src="http://github.com/celian-rib/ASCII-galaxy-simulation/blob/main/img/single_galaxy.gif?raw=true" />
 
 ### Run the project :
 
-```make```
+-  Compile :
+```
+make
+```
 
-```./galaxy```
+-  Single galaxy simulation :
+```
+./galaxy single
+```
 
-- collision
+-  Two galaxies colliding simulation :
+```
+./galaxy collision
+```
 
-- blackhole

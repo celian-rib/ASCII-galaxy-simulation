@@ -16,13 +16,23 @@ typedef struct {
 typedef struct {
     Grid *grid;
     const float STEP;
-    const int RING_COUNT;
-    const int RING_SPACING;
-    const int RING_BODY_MULTIPLIER;
+    const int GALAXY_BODY_COUNT;
+    const int GALAXY_RADIUS;
 } Simulation;
 
+/**
+ * @brief Simulate one step with the given simulation object
+ * 
+ * @param sim simulation object to work with
+ */
 void simulate(const Simulation *sim);
 
-void summon_galaxy(Simulation *simulation, const Vector2 *position, const Vector2 *initial_velocity);
+/**
+ * @brief Create a new galaxy into the given simulation object
+ * 
+ * @param simulation simulation in which the galaxy will be created
+ * @param position position of the galaxy relative to the screen
+ */
+void summon_galaxy(Simulation *simulation, const Vector2 *position);
 
 #endif
